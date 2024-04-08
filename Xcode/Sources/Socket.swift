@@ -62,6 +62,21 @@ open class Socket: Hashable, Equatable {
             #endif
         }
     }
+    public func IPv4Address() throws -> UInt32 {
+        var addr = sockaddr_in()
+        return try withUnsafePointer(to: &addr) { pointer in
+            var len = socklen_t(MemoryLayout<sockaddr_in>.size)
+            if getsockname(socketFileDescriptor, UnsafeMutablePointer(OpaquePointer(pointer)), &len) != 0 {
+                throw SocketError.getSockNameFailed(Errno.description())
+            }
+            let address = pointer.pointee.sin_addr.s_addr
+            #if os(Linux)
+                return ntohs(sin_port)
+            #else
+                return UInt32(OSHostByteOrder()) != OSLittleEndian ? address.littleEndian : address.bigEndian
+            #endif
+        }
+    }
 
     public func isIPv4() throws -> Bool {
         var addr = sockaddr_in()

@@ -58,6 +58,9 @@ open class HttpServerIO {
     public func port() throws -> Int {
         return Int(try socket.port())
     }
+    public func IPv4Address() throws -> UInt32 {
+        return try socket.IPv4Address()
+    }
 
     public func isIPv4() throws -> Bool {
         return try socket.isIPv4()
